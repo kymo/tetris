@@ -9,7 +9,7 @@ public class TetrisStart {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		TetrisUI tetrisUI = new TetrisUI();
-		
+		tetrisUI.initUI();
 	}
 
 }
