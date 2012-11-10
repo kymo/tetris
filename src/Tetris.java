@@ -17,9 +17,8 @@ public class Tetris {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-                TetrisUI tetris = new TetrisUI();
-                tetris.initUI();
-                tetris.movieStart();
-        
+        TetrisUI tetris = new TetrisUI();
+        tetris.initUI();
+        tetris.movieStart();
     }
 }
