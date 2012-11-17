@@ -1,3 +1,5 @@
+
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -17,11 +19,20 @@ public class TetrisBlock {
 	private final int RIGHT_VERTICAL_BENDING = 6;
 	private final int BLOCK_NONE = 7;
 	private final int BLOCK_INIT_DIRECTION = 0;
+	private final int DRAWPANEL_WEIGHT = 300;
+	private final int DRAWPANEL_HEIGHT = 500;
 	private int m_blockDirection;//the block's shape
 	
 	private int m_blockStyle;//the block's style  
 	public int m_blockGrid[][];//the filled grid of the block
 	public int m_blockBottomY[];//the block's bottom Y coordinate
+	public int m_blockLeftX[];//the block's left X coordinate
+	public int m_blockRightX[];//the block's right X coordinate
+	public int m_blockUy;//the block's upper boundary's y coordinate
+	public int m_blockLy;// the block's lower boundary's y coordinate
+	public int m_blockLx;//the block's left border's x coordinate
+	public int m_blockRx;//the block's right border's x coordinate
+	public boolean isToEnd;//is the block's get to the bottom
 	private int m_blockCoordinateX;//the block's filled grid's left-top x coordinate 
 	private int m_blockCoordinateY;//the block's filled grid's left-top y coordinate 
 	private int m_blockShape[][] = {
@@ -57,10 +68,11 @@ public class TetrisBlock {
 	 * @param Y
 	 */
 	void setCoordinateXY(int X,int Y)
-	{
+	{	
 		m_blockCoordinateX = X;
 		m_blockCoordinateY = Y;
-		changeBlockBottomY();
+		changeBlockScope();
+			
 	}
 	/**
 	 * init the block's occupied grids and the start location
@@ -81,15 +93,63 @@ public class TetrisBlock {
 		int blockShape ;
 		blockShape = m_blockShape[m_blockStyle - 1][m_blockDirection];
 		m_blockBottomY = new int[5];
+		m_blockLeftX = new int[5];
+		m_blockRightX = new int[5];
+		isToEnd = false;
 		tetrisBlockForm(m_blockDirection, blockShape);
-		System.out.println("hello this is form Block");
 	}
-	public void changeBlockBottomY()
+	
+	/**
+	 * 
+	 */
+	public void generateNewBlock(int blockStyle, int blockOrientation)
 	{
+		m_blockDirection = BLOCK_INIT_DIRECTION;
+		m_blockCoordinateX = 100;
+		m_blockCoordinateY = 0;
+		m_blockStyle = blockStyle;
+
+		for(int j = 0; j < 4; j ++)
+		{
+			m_blockBottomY[j] = -1;
+			m_blockLeftX[j] = -1;
+			m_blockRightX[j] = -1;
+		}
+		int blockShape ;
+		blockShape = m_blockShape[m_blockStyle - 1][m_blockDirection];
+		tetrisBlockForm(m_blockDirection, blockShape);
+	}
+	/**
+	 * change the block's bottom's y coordinate and left x and right x coordinate
+	 * and also the boundary of the block
+	 */
+	public void changeBlockScope()
+	{
+		for(int j = 0; j < 4; j ++)
+		{
+			m_blockBottomY[j] = -1;
+			m_blockLeftX[j] = -1;
+			m_blockRightX[j] = -1;
+		}
 		for(int j = 0;j < 4;j ++)
 			for(int k = 0;k < 4;k ++)
-				if(m_blockGrid[j][k] == 1)
+				if(m_blockGrid[j][k] == 1)	
 					m_blockBottomY[k] = m_blockCoordinateY + j * 20 + 20;
+		for(int j = 0; j < 4; j ++)
+			for(int k = 0; k < 4;k ++)
+				if(m_blockGrid[j][k] == 1)
+				{
+					m_blockLeftX[j] = m_blockCoordinateX + k * 20;
+					break;
+				}
+		for(int j = 0; j < 4; j ++)
+			for(int k = 3; k >= 0; k --)
+				if(m_blockGrid[j][k] == 1)
+				{
+					m_blockRightX[j] = m_blockCoordinateX + k * 20 + 20;
+					break;
+				}
+		
 	}
 	/**
 	 * according the the direction and blockShape to form the block
@@ -103,10 +163,6 @@ public class TetrisBlock {
 		if(len < 16)
 			for(int j = 0;j < 16 - len; j ++)
 				hexBlockShape = '0' + hexBlockShape;
-		System.out.println(hexBlockShape);
-		System.out.println("fu");
-		for(int j = 0; j < 4;j ++)
-			m_blockBottomY[j] = 0;
 		for(int j = 0;j < 16;j ++)
 		{
 			m_blockGrid[j / 4][j % 4] = hexBlockShape.charAt(j) - '0';
@@ -118,10 +174,63 @@ public class TetrisBlock {
 	 * transformation of the block from current state to another state by orientation
 	 * @param style
 	 */
-	public void tetrisBlockShapeTransformation()
+	public void tetrisBlockShapeTransformation(int [][]  frameBlockGrid)
 	{
-		m_blockDirection = (m_blockDirection + 1) % 4;
-		int blockShape = m_blockShape[m_blockStyle - 1][m_blockDirection];
-		tetrisBlockForm(m_blockDirection, blockShape);
+		//m_blockDirection = (m_blockDirection + 1) % 4;
+		//int blockShape = m_blockShape[m_blockStyle - 1][m_blockDirection];
+		//tetrisBlockForm(m_blockDirection, blockShape);
+		int blockDirection;
+		if((blockDirection = isTransformationLegal(frameBlockGrid)) != -1)
+		{
+			System.out.println("erroe " + blockDirection);
+			m_blockDirection = blockDirection;
+			int blockShape = m_blockShape[m_blockStyle - 1][m_blockDirection];
+			tetrisBlockForm(m_blockDirection, blockShape);
+		}
+	}
+	private int isTransformationLegal(int [][] frameBlockGrid) {
+		// TODO Auto-generated method stub
+		int blockDirection = (m_blockDirection + 1) % 4;
+		int blockShape = m_blockShape[m_blockStyle - 1][blockDirection];
+		int [][]blockGrid = new int[4][4];
+		//tetrisBlockForm(m_blockDirection, blockShape);
+		String hexBlockShape = Integer.toBinaryString(blockShape);
+		int len = hexBlockShape.length();
+		if(len < 16)
+			for(int j = 0;j < 16 - len; j ++)
+				hexBlockShape = '0' + hexBlockShape;
+		for(int j = 0;j < 16;j ++)
+			blockGrid[j / 4][j % 4] = hexBlockShape.charAt(j) - '0';
+		
+
+		System.out.println("cor: " + m_blockCoordinateX + " " + m_blockCoordinateY);
+		for(int j = 0; j < 4;j ++)
+			for(int k = 0; k < 4;k ++)
+			{
+				if(blockGrid[j][k] == 1)
+				{
+					System.out.println("j,k:" + j + " "+ k );
+					int rightX = m_blockCoordinateX + 20 * k + 20;
+					int bottomY = m_blockCoordinateY + 20 * j + 20;
+					int leftX = m_blockCoordinateX + 20 * k;
+					System.out.println("three boundary: " + leftX + " " + rightX + " " + bottomY);
+					if(! (leftX >= 0 && rightX <= DRAWPANEL_WEIGHT && bottomY <= DRAWPANEL_HEIGHT))
+					{
+						blockDirection = -1;
+						return blockDirection;
+					}
+					int corX = m_blockCoordinateX + 20 * k;
+					int corY = m_blockCoordinateY + 20 * j;
+					if(corX >= 0 && corX <= DRAWPANEL_WEIGHT - 20 && corY >= 0 && corY <= DRAWPANEL_HEIGHT - 20)
+					{
+						if(frameBlockGrid[corY / 20][corX / 20] == 1)
+						{
+							blockDirection = -1;
+							return blockDirection;
+						}
+					}
+				}
+			}
+		return blockDirection;
 	}
 }
