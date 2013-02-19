@@ -19,6 +19,6 @@ public class Tetris {
         // TODO code application logic here
         TetrisUI tetris = new TetrisUI();
         tetris.initUI();
-        tetris.movieStart();
+        tetris.gameStart();
     }
 }
