@@ -14,16 +14,16 @@ using namespace std;
 #pragma comment(lib,"ole32.lib")  //coinitialize cocreateinstance需要调用ole32.dll
 #pragma comment(lib,"sapi.lib")   //sapi.lib在sdk的lib目录，必须正确配置
 
-#define XML_FILE					"voice.xml"
-#define INIT_ERROR					-1
-#define INIT_OK						0
+#define XML_FILE                    "voice.xml"
+#define INIT_ERROR                    -1
+#define INIT_OK                        0
 #define CREATE_SHARED_ENGINE_ERROR  1
 #define CREATE_RECO_CONTEXT_ERROR   2
-#define CREATE_NOTIFY_MSG_ERROR		3
-#define CREATE_INTEREST_ERROR		4
-#define CREATE_GRAMMAR_ERROR		5
-#define LOAD_XML_FILE_ERROR			6
-#define SET_RULE_STATE_ERROR		7
+#define CREATE_NOTIFY_MSG_ERROR        3
+#define CREATE_INTEREST_ERROR        4
+#define CREATE_GRAMMAR_ERROR        5
+#define LOAD_XML_FILE_ERROR            6
+#define SET_RULE_STATE_ERROR        7
 #define MOVE_LEFT L"向左"
 #define MOVE_RIGHT L"向右"
 #define MOVE_DOWN L"向下"
